@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "id": "sunton_esp32_8048s070",
+  "revision": "1.3",
+  "chip": "esp32s3",
+  "flash_mb": 16,
+  "psram_mb": 8,
+
+  "display": {
+    "interface": "rgb565",
+    "panel": "EK9716 / ST7262 class (dumb RGB, no GRAM)",
+    "width": 800,
+    "height": 480,
+    "pclk_hz": 16000000,
+    "profile": "balanced",
+
+    "timings": {
+      "hsync_pulse_width": 4,
+      "hsync_back_porch": 8,
+      "hsync_front_porch": 8,
+      "vsync_pulse_width": 4,
+      "vsync_back_porch": 8,
+      "vsync_front_porch": 8
+    },
+
+    "pclk_gpio": 42,
+    "de_gpio": 41,
+    "vsync_gpio": 40,
+    "hsync_gpio": 39,
+
+    "data_gpio": [
+      15, 7, 6, 5, 4,
+      9, 46, 3, 8, 16, 1,
+      14, 21, 47, 48, 45
+    ],
+
+    "backlight_gpio": 2,
+    "backlight_freq_hz": 5000,
+    "backlight_default_pct": 80,
+    "backlight_active_high": true
+  },
+
+  "touch": {
+    "controller": "gt911",
+    "i2c_port": 0,
+    "i2c_addr": "0x5D",
+    "sda_gpio": 19,
+    "scl_gpio": 20,
+    "rst_gpio": 38,
+    "int_gpio": -1,
+    "poll_hz": 20,
+    "invert_x": false,
+    "invert_y": false,
+    "swap_xy": false,
+    "width": 800,
+    "height": 480
+  },
+
+  "audio": {
+    "codec": "none"
+  },
+
+  "sdcard": {
+    "present": true,
+    "mode": "sdmmc_1bit",
+    "cmd_gpio": 11,
+    "clk_gpio": 12,
+    "d0_gpio": 13,
+    "mount_point": "/sdcard"
+  },
+
+  "verify": {
+    "H1": "SD card pinout (CMD 11 / CLK 12 / D0 13) — confirm on hardware",
+    "H2": "Audio path — DAC vs codec; disabled in v1 until confirmed",
+    "H3": "Panel max stable PCLK — 16 MHz assumed (~39 Hz)",
+    "H4": "Revision v1.1 vs v1.3 timing differences",
+    "H5": "Backlight polarity — active-high assumed",
+    "H6": "SD slot 1-bit vs 4-bit — 1-bit assumed"
+  }
+}

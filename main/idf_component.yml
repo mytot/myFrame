@@ -1,0 +1,5 @@
+# Managed components for the shell image. Pinned to the LVGL 9 line the UI
+# code targets (LVGL 9 API: lv_button_create, lv_screen_load, lv_obj_remove_flag).
+dependencies:
+  lvgl/lvgl:
+    version: "^9.3.0"

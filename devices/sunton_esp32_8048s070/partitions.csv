@@ -1,0 +1,17 @@
+# Sunton ESP32-8048S070 — 16 MB flash
+#
+# FrameOS occupies two A/B slots so it can update itself and roll back. Native
+# apps occupy real OTA subtypes so the stock bootloader handles selection,
+# validation and rollback for free — see docs/ARCHITECTURE.md §7.
+#
+# Name,      Type, SubType, Offset,     Size,      Flags
+nvs,         data, nvs,      0x9000,     0x6000,
+otadata,     data, ota,      0xF000,     0x2000,
+phy_init,    data, phy,      0x11000,    0x1000,
+shell_a,     app,  ota_0,    0x20000,    0x300000,
+shell_b,     app,  ota_1,    0x320000,   0x300000,
+app_0,       app,  ota_2,    0x620000,   0x180000,
+app_1,       app,  ota_3,    0x7A0000,   0x180000,
+app_2,       app,  ota_4,    0x920000,   0x180000,
+app_3,       app,  ota_5,    0xAA0000,   0x180000,
+storage,     data, fat,      0xC20000,   0x3D0000,

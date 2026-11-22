@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "boards": [
+    {
+      "id": "sunton_esp32_8048s070",
+      "chip": "esp32s3",
+      "flash_mb": 16,
+      "psram_mb": 8,
+      "status": "supported"
+    }
+  ]
+}

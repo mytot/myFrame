@@ -1,0 +1,64 @@
+name: ci
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  host-tests:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: make
+
+  idf-build:
+    runs-on: ubuntu-24.04
+    container: espressif/idf:v6.1.1
+    steps:
+      - uses: actions/checkout@v5
+      - run: |
+          . $IDF_PATH/export.sh
+          idf.py build 2>&1 | tee build.log
+          idf.py size 2>&1 | tee -a build.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: idf-build-log
+          path: build.log
+
+  native-example:
+    runs-on: ubuntu-24.04
+    container: espressif/idf:v6.1.1
+    steps:
+      - uses: actions/checkout@v5
+      - run: |
+          . $IDF_PATH/export.sh
+          cmake -B build-native -S examples/native_hello -DBOARD=sunton_esp32_8048s070 2>&1 | tee native.log
+          cmake --build build-native 2>&1 | tee -a native.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-build-log
+          path: native.log
+
+  wasm-example:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: sudo apt-get update -y && sudo apt-get install -y clang lld
+      - run: |
+          python3 tools/build_app.py examples/wasm_hello/app.c \
+            --manifest examples/wasm_hello/manifest.json \
+            --out dist/example.clock-1.0.0.fpack --verbose 2>&1 | tee wasm.log
+          python3 tools/pack.py --verify dist/example.clock-1.0.0.fpack \
+            --pubkey keys/dev/publisher.pub --device-code 2>&1 | tee -a wasm.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wasm-build-log
+          path: wasm.log
+

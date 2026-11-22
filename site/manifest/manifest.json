@@ -1,0 +1,12 @@
+{
+  "name": "myFrame",
+  "version": "latest",
+  "builds": [
+    {
+      "chipFamily": "ESP32-S3",
+      "parts": [
+        {"path": "https://github.com/mytot/myFrame/releases/latest/download/myframe.factory.bin", "offset": 0}
+      ]
+    }
+  ]
+}

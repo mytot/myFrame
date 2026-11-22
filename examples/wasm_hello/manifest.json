@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "example.clock",
+  "name": "Clock",
+  "version": "1.0.0",
+  "kind": "managed",
+  "sdk": "^1.0.0",
+  "entry": "payload.bin",
+  "description": "A managed (WASM) app: an uptime clock with a counter. Hot-loaded, no reboot.",
+  "author": "FrameOS examples",
+  "permissions": ["ui", "kv"],
+  "requires": { "chip": ["esp32s3"], "psram_mb": 2 },
+  "render": { "class": "light", "max_fps": 10 }
+}

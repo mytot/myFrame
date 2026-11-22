@@ -1,0 +1,60 @@
+# Boot-time options for FrameOS. Everything here is a Kconfig symbol so that a
+# board or a build can override it without touching source.
+
+menu "FrameOS"
+
+    config FRAME_STORE_URL
+        string "Default app store base URL"
+        default "http://192.168.1.10:8080"
+        help
+            Where the device fetches catalog.json, catalog.sig and .fpack
+            packages. Can be changed at runtime in Settings -> App store.
+
+    config FRAME_STORE_ALLOW_UNSIGNED
+        bool "Accept unsigned packages and catalogs (DEVELOPMENT ONLY)"
+        default n
+        help
+            Disables Ed25519 verification of catalogs and packages. Never
+            enable this for a release build: tools/build.py --release refuses
+            to build with it set.
+
+    config FRAME_HTTP_API_ENABLE
+        bool "Device HTTP API on port 80 (dev store)"
+        default y
+        help
+            Serves /api/apps, /api/catalog, /api/logs and friends for
+            tools/devstore.py. No authentication: intended for a bench
+            network. Disable for a release build.
+
+    config FRAME_WASM_HEAP_MAX_KB
+        int "Maximum linear memory per managed app (KB)"
+        default 512
+        range 64 4096
+        help
+            A managed (WASM) app whose module declares more memory than this
+            is refused at load time, so one app cannot take all of PSRAM.
+
+    config FRAME_WASM_STACK_KB
+        int "WASM value stack per managed app (KB)"
+        default 64
+        range 16 256
+
+    config FRAME_WASM_TASK_STACK
+        int "WASM task stack (bytes)"
+        default 6144
+        range 4096 16384
+
+    config FRAME_LOG_RING_KB
+        int "Log ring buffer in PSRAM (KB)"
+        default 256
+        range 32 2048
+
+    config FRAME_BOOT_CONFIRM_MS
+        int "Delay before the boot is confirmed healthy (ms)"
+        default 2500
+        range 500 30000
+        help
+            After this many milliseconds with the LVGL task alive, the image
+            is marked valid so the bootloader will not roll it back.
+
+endmenu

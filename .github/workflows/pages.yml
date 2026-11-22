@@ -1,0 +1,68 @@
+name: pages
+on:
+  push:
+    branches: ["**"]
+    paths: [site/**, docs/**, devices/**, .github/workflows/pages.yml]
+  pull_request:
+    paths: [site/**, docs/**, devices/**, .github/workflows/pages.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build site
+        run: |
+          python3 - <<'PY'
+          import json, pathlib
+          idx=json.load(open("devices/index.json"))
+          out={"boards":[]}
+          for b in idx["boards"]:
+              p=pathlib.Path(f"devices/{b['id']}/device.json")
+              j=json.load(open(p)) if p.exists() else {}
+              disp=j.get("display",{})
+              out["boards"].append({**b, "display": f"{disp.get('width','?')}×{disp.get('height','?')} {disp.get('interface','')}"})
+              out["boards"][-1]["revision"]=j.get("revision","")
+          pathlib.Path("site/assets/boards.json").write_text(json.dumps(out, indent=2))
+          print(open("site/assets/boards.json").read())
+          # Copy docs into site for offline access + Jekyll fallback
+          import shutil, os
+          os.makedirs("site/docs", exist_ok=True)
+          for f in pathlib.Path("docs").glob("*.md"):
+              shutil.copy(f, f"site/docs/{f.name}")
+          print("site ready")
+          PY
+          ls -la site/
+          ls -la site/assets/
+      - uses: actions/configure-pages@v5
+        if: github.ref == 'refs/heads/main'
+      - uses: actions/upload-pages-artifact@v4
+        if: github.ref == 'refs/heads/main'
+        with:
+          path: site
+      - uses: actions/upload-artifact@v4
+        if: github.ref != 'refs/heads/main'
+        with:
+          name: site-preview
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

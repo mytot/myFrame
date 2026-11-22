@@ -1,0 +1,37 @@
+# Sunton ESP32-8048S070C — board-specific sdkconfig overrides
+#
+# Layered on top of the project-wide sdkconfig.defaults by the top-level
+# CMakeLists.txt.
+
+CONFIG_IDF_TARGET="esp32s3"
+
+# 8 MB octal PSRAM. 120 MHz is required: at 80 MHz the panel's continuous
+# scanout alone consumes ~80% of the achievable PSRAM bandwidth.
+CONFIG_SPIRAM=y
+CONFIG_SPIRAM_MODE_OCT=y
+CONFIG_SPIRAM_SPEED_120M=y
+CONFIG_SPIRAM_USE_MALLOC=y
+CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL=16384
+CONFIG_SPIRAM_MALLOC_RESERVE_INTERNAL=32768
+CONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP=y
+
+# 16 MB flash, QIO at 80 MHz.
+CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y
+CONFIG_ESPTOOLPY_FLASHMODE_QIO=y
+CONFIG_ESPTOOLPY_FLASHFREQ_80M=y
+
+# Both cores. CONFIG_FREERTOS_UNICORE must remain off — see
+# docs/RENDER_PERFORMANCE.md §4 for the task/core schedule.
+CONFIG_FREERTOS_UNICORE=n
+CONFIG_FREERTOS_HZ=1000
+
+# Keep the LVGL render path out of flash so a flash write cannot stall it.
+CONFIG_FRAME_RENDER_IN_IRAM=y
+
+# The RGB panel needs the LCD_CAM peripheral.
+CONFIG_LCD_RGB_ENABLE=y
+CONFIG_LCD_RGB_RESTART_IN_VSYNC=y
+
+# Console on the CH340 UART.
+CONFIG_ESP_CONSOLE_UART_DEFAULT=y
+CONFIG_ESP_CONSOLE_UART_BAUDRATE=115200

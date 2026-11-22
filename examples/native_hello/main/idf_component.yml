@@ -1,0 +1,4 @@
+# A native app image needs LVGL too (frame_ui is linked in).
+dependencies:
+  lvgl/lvgl:
+    version: "^9.3.0"

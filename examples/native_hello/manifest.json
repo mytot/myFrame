@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "example.counter",
+  "name": "Counter",
+  "version": "1.0.0",
+  "kind": "native",
+  "sdk": "^1.0.0",
+  "entry": "payload.bin",
+  "description": "A native app: a counter with a Back arrow that returns to the launcher.",
+  "author": "FrameOS examples",
+  "permissions": ["ui"],
+  "requires": {
+    "chip": ["esp32s3"],
+    "psram_mb": 8,
+    "display": { "min_width": 800, "min_height": 480, "touch": true }
+  }
+}

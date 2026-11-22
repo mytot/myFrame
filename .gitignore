@@ -1,0 +1,23 @@
+# Build outputs
+build/
+build-*/
+dist/
+store/
+sdkconfig
+sdkconfig.old
+dependencies.lock
+
+# Python
+__pycache__/
+*.pyc
+
+# Editors / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Keys: only the development pair is committed (keys/dev/README.md explains why)
+keys/release/
+keys/*.key
+!keys/dev/*.key

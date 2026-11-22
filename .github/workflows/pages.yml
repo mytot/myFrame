@@ -1,7 +1,9 @@
 name: pages
 on:
   push:
-    branches: [main, arena/1516dfa5-myframe]
+    branches: ["**"]
+    paths: [site/**, docs/**, devices/**, .github/workflows/pages.yml]
+  pull_request:
     paths: [site/**, docs/**, devices/**, .github/workflows/pages.yml]
   workflow_dispatch:
 
@@ -18,7 +20,7 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Build site
         run: |
           python3 - <<'PY'
@@ -43,16 +45,24 @@ jobs:
           ls -la site/
           ls -la site/assets/
       - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+        if: github.ref == 'refs/heads/main'
+      - uses: actions/upload-pages-artifact@v4
+        if: github.ref == 'refs/heads/main'
         with:
+          path: site
+      - uses: actions/upload-artifact@v4
+        if: github.ref != 'refs/heads/main'
+        with:
+          name: site-preview
           path: site
 
   deploy:
     needs: build
     runs-on: ubuntu-24.04
+    if: github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

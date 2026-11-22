@@ -8,7 +8,7 @@ jobs:
   host-tests:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
         with: { python-version: "3.11" }
       - run: make
@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-24.04
     container: espressif/idf:v6.1.1
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: |
           . $IDF_PATH/export.sh
           idf.py build 2>&1 | tee build.log
@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-24.04
     container: espressif/idf:v6.1.1
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: |
           . $IDF_PATH/export.sh
           cmake -B build-native -S examples/native_hello -DBOARD=sunton_esp32_8048s070 2>&1 | tee native.log
@@ -46,7 +46,7 @@ jobs:
   wasm-example:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
         with: { python-version: "3.11" }
       - run: sudo apt-get update -y && sudo apt-get install -y clang lld

@@ -52,7 +52,7 @@ def find_clang() -> str:
 
 
 def compile_wasm(sources: list[str], out: str, *, clang: str, optimize: str = "-O2",
-                 extra_flags: list[str] | None = None) -> None:
+                 extra_flags: list[str] | None = None, verbose: bool = False) -> None:
     cmd = [
         clang, "--target=wasm32", optimize, "-nostdlib", "-ffreestanding",
         "-fno-builtin", "-Wall", "-Wno-unknown-attributes",
@@ -65,6 +65,8 @@ def compile_wasm(sources: list[str], out: str, *, clang: str, optimize: str = "-
         *(extra_flags or []),
         "-o", out, *sources,
     ]
+    if verbose:
+        print("clang:", " ".join(cmd))
     subprocess.run(cmd, check=True)
 
 
@@ -73,7 +75,8 @@ def build_and_pack(args) -> int:
     with tempfile.TemporaryDirectory() as td:
         wasm = os.path.join(td, "app.wasm")
         compile_wasm(args.sources, wasm, clang=clang, optimize=args.opt,
-                     extra_flags=args.flags.split() if args.flags else None)
+                     extra_flags=args.flags.split() if args.flags else None,
+                     verbose=args.verbose)
         with open(wasm, "rb") as f:
             payload = f.read()
 
@@ -121,6 +124,7 @@ def main(argv=None) -> int:
     ap.add_argument("--publisher")
     ap.add_argument("--root")
     ap.add_argument("--serve", help="dev store pkgs directory to copy the .fpack into")
+    ap.add_argument("--verbose", action="store_true", help="show the clang command")
     args = ap.parse_args(argv)
     try:
         return build_and_pack(args)

@@ -78,7 +78,19 @@ static inline frame_node_t frame_ui_node(frame_node_t parent, int32_t type,
             n++;
         }
     }
-    return frame_ui_node_raw(parent, type, props, props, n);
+    return frame_ui_node_raw(parent, type, (const char *)0, props, n);
+}
+
+static inline frame_node_t frame_ui_node_with_id(frame_node_t parent, int32_t type,
+                                                 const char *id, const char *props)
+{
+    int32_t n = 0;
+    if (props != NULL) {
+        while (props[n] != '\0') {
+            n++;
+        }
+    }
+    return frame_ui_node_raw(parent, type, id, props, n);
 }
 
 void frame_ui_set_text(frame_node_t node, const char *text) FRAME_IMPORT("frame_ui_set_text");

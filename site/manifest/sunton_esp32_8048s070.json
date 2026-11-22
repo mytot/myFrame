@@ -1,0 +1,12 @@
+{
+  "name": "myFrame — sunton_esp32_8048s070",
+  "version": "latest",
+  "builds": [
+    {
+      "chipFamily": "ESP32-S3",
+      "parts": [
+        {"path": "https://github.com/mytot/myFrame/releases/latest/download/myframe-sunton_esp32_8048s070.factory.bin", "offset": 0}
+      ]
+    }
+  ]
+}

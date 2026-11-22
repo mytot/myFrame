@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>myFrame — ESP32 App-Store Firmware</title>
+<meta name="description" content="Self-hosted, app-store-driven firmware for Sunton ESP32-8048S070C and any device described by device.json. ESP-IDF v6.1 · LVGL 9 · wasm3.">
+<meta property="og:title" content="myFrame — ESP32 App-Store Firmware">
+<meta property="og:description" content="Flash, document, and extend your ESP32 touch display. One firmware, any board.">
+<meta property="og:image" content="assets/og.png">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/style.css">
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="logo" href="./"><span class="logo-mark">◧</span> myFrame</a>
+    <div class="nav-links">
+      <a href="docs/">Docs</a>
+      <a href="flasher/">Flasher</a>
+      <a href="https://github.com/mytot/myFrame" target="_blank" rel="noopener">GitHub <i data-lucide="external-link"></i></a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <div class="eyebrow">ESP-IDF v6.1 · ESP32-S3 · LVGL 9 · wasm3 · Ed25519</div>
+      <h1>One firmware,<br><span class="accent">any board.</span></h1>
+      <p class="lead">myFrame is a self-hosted, app-store-driven firmware for the Sunton ESP32-8048S070C — and any future board you describe in <code>device.json</code>. Native + WASM apps, signed catalog, local dev store, no cloud.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="flasher/">⚡ Flash now</a>
+        <a class="btn" href="docs/">Read docs</a>
+        <a class="btn ghost" href="https://github.com/mytot/myFrame/releases">Latest release</a>
+      </div>
+      <div class="stats">
+        <span><strong>800×480</strong> RGB @ 39 Hz</span>
+        <span><strong>16 MB</strong> flash · <strong>8 MB</strong> PSRAM</span>
+        <span><strong>6</strong> OTA slots</span>
+      </div>
+    </div>
+    <div class="hero-card">
+      <div class="device-mock">
+        <div class="screen">
+          <div class="screen-top">myFrame · Launcher</div>
+          <div class="tiles">
+            <div class="tile store"><i data-lucide="store"></i><span>Store</span></div>
+            <div class="tile"><i data-lucide="gamepad-2"></i><span>Counter</span></div>
+            <div class="tile"><i data-lucide="clock"></i><span>Clock</span></div>
+            <div class="tile"><i data-lucide="settings"></i><span>Settings</span></div>
+            <div class="tile"><i data-lucide="scroll-text"></i><span>Logs</span></div>
+            <div class="tile plus">+</div>
+          </div>
+        </div>
+        <div class="bezel">Sunton 8048S070C</div>
+      </div>
+      <div class="hero-note">Boots to launcher in ≤3 s · drag .fpack to dev store</div>
+    </div>
+  </div>
+</header>
+
+<section class="boards" id="boards">
+  <div class="section-inner">
+    <h2>Supported boards</h2>
+    <p class="muted">Add a board by adding a folder under <code>devices/</code>. Same firmware, different pins.</p>
+    <div class="board-grid" id="boardGrid"></div>
+    <p class="muted small">Want your board? See <a href="docs/#device-support">Device Support</a>.</p>
+  </div>
+</section>
+
+<section class="features">
+  <div class="section-inner">
+    <div class="feature">
+      <i data-lucide="layers"></i>
+      <h3>Two app models</h3>
+      <p><strong>Native</strong> (full IDF, OTA slot, reboot) and <strong>Managed</strong> (WASM, hot-load ~10 ms). Same catalog, same signing, same store UI.</p>
+    </div>
+    <div class="feature">
+      <i data-lucide="shield-check"></i>
+      <h3>Signed everything</h3>
+      <p>Ed25519 from day one. Root signs catalog, publishers sign packages. Dev-mode bypass is a build flag, not a default.</p>
+    </div>
+    <div class="feature">
+      <i data-lucide="zap"></i>
+      <h3>Render in SRAM</h3>
+      <p>LVGL renders to 2× 800×16 SRAM lines, blits only the dirty rect to PSRAM. No beam-chasing, no tearing, 39 Hz measured.</p>
+    </div>
+    <div class="feature">
+      <i data-lucide="box"></i>
+      <h3>Dev store included</h3>
+      <p><code>tools/devstore.py</code> serves catalog, packages, and a browser UI that proxies the device HTTP API. No cloud needed.</p>
+    </div>
+  </div>
+</section>
+
+<section class="quickstart">
+  <div class="section-inner">
+    <h2>Quick start</h2>
+    <div class="code-tabs">
+      <button class="tab active" data-tab="flash">Flash</button><button class="tab" data-tab="dev">Develop</button><button class="tab" data-tab="pack">Publish</button>
+    </div>
+    <pre class="code active" data-pane="flash"><code># web flasher → https://mytot.github.io/myFrame/flasher/
+# or esptool:
+esptool.py --chip esp32s3 --port /dev/ttyACM0 write-flash -z 0x0 myframe.factory.bin</code></pre>
+    <pre class="code" data-pane="dev"><code>make                  # host tests (no IDF)
+. $IDF_PATH/export.sh && idf.py build
+python3 tools/devstore.py --pkgs dist --port 8080  # → device Settings → Store URL = http://laptop:8080</code></pre>
+    <pre class="code" data-pane="pack"><code>python3 tools/build_app.py examples/wasm_hello/app.c --manifest examples/wasm_hello/manifest.json --out dist/clock.fpack
+python3 tools/pack.py --verify dist/clock.fpack --pubkey keys/dev/publisher.pub --device-code
+python3 tools/catalog.py build --pkgs dist --out store --base-url http://192.168.1.10:8080</code></pre>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <span>MIT © Praveen Parsa · <a href="https://github.com/mytot/myFrame">mytot/myFrame</a></span>
+    <span><a href="docs/">Docs</a> · <a href="flasher/">Flasher</a> · <a href="https://github.com/mytot/myFrame/actions">CI</a></span>
+  </div>
+</footer>
+
+<script>
+lucide.createIcons();
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.tab,.code').forEach(e=>e.classList.remove('active'));
+  b.classList.add('active');
+  document.querySelector(`[data-pane="${b.dataset.tab}"]`).classList.add('active');
+}));
+fetch('assets/boards.json').then(r=>r.json()).then(data=>{
+  const g=document.getElementById('boardGrid');
+  data.boards.forEach(b=>{
+    const el=document.createElement('a');
+    el.className='board-card'; el.href=`flasher/?board=${b.id}`;
+    el.innerHTML=`<div class="board-chip">${b.chip} · ${b.flash_mb}MB</div><h3>${b.id}</h3><span class="badge ${b.status}">${b.status}</span><p class="small muted">${b.display||''}</p>`;
+    g.appendChild(el);
+  });
+}).catch(()=>{});
+</script>
+</body>
+</html>

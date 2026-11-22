@@ -67,6 +67,12 @@ Set the device's store URL in **Settings → App store → Server** to `http://<
 | 08 | [App Store](docs/APP_STORE.md) | Package format, signing, slots |
 | 09 | [App SDK](docs/APP_SDK.md) | Native vs managed APIs |
 
+## Docs & Flasher
+
+**Docs:** https://mytot.github.io/myFrame/ &nbsp;·&nbsp; **Web Flasher:** https://mytot.github.io/myFrame/flasher/ — pick your board and flash the latest release from the browser (Chrome/Edge, Web Serial).
+
+Releases are built in CI (`.github/workflows/release.yml`) per board: `myframe-<board>.factory.bin` (full flash) and `myframe-<board>.ota.bin` (OTA). Tag `v*` to publish.
+
 ## Boards
 
 One today — the Sunton ESP32-8048S070C — described declaratively in `devices/sunton_esp32_8048s070/device.json` (pins, timings, PSRAM, touch, SD). Adding a board is a new directory plus an entry in `devices/index.json`; the firmware source is identical (see `docs/DEVICE_SUPPORT.md`).

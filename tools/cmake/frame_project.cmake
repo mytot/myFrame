@@ -59,6 +59,10 @@ function(frame_project_setup repo_root)
         ${EXTRA_SDKCONFIG_DEFAULTS}
         PARENT_SCOPE)
     set(PARTITION_TABLE_CUSTOM_FILENAME "${FRAME_BOARD_DIR}/partitions.csv" PARENT_SCOPE)
+    if(NOT IDF_TARGET)
+        set(IDF_TARGET "esp32s3" PARENT_SCOPE)
+        set(IDF_TARGET "esp32s3")
+    endif()
 
     # Generated headers: the board description and the pinned store root key.
     set(FRAME_GEN_DIR "${CMAKE_BINARY_DIR}/frame_gen" PARENT_SCOPE)
@@ -104,5 +108,8 @@ endfunction()
 
 # Call after project(): exposes the generated headers to every component.
 function(frame_project_finish)
-    idf_build_set_property(INCLUDE_DIRECTORIES "${FRAME_GEN_DIR}" APPEND)
+    # Use include_directories so the generated headers are visible without
+    # going through the build-properties file (which would need quoting
+    # gymnastics for the path).
+    include_directories("${FRAME_GEN_DIR}")
 endfunction()

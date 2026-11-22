@@ -18,8 +18,6 @@ set(WASM3_SRCS
     "${WASM3_DIR}/m3_parse.c"
 )
 
-set_source_files_properties(${WASM3_SRCS} PROPERTIES COMPILE_OPTIONS "-w")
-
 idf_component_register(
     SRCS
         "wasm.c"
@@ -28,3 +26,11 @@ idf_component_register(
     INCLUDE_DIRS "include" "${WASM3_DIR}"
     REQUIRES frame_core frame_ui frame_storage frame_log lvgl
 )
+
+# Suppress warnings for vendored wasm3. This must be after
+# idf_component_register and must not run in the component-requirements
+# collection pass (cmake -P), where set_source_files_properties is not
+# scriptable.
+if(NOT CMAKE_SCRIPT_MODE_FILE)
+    set_source_files_properties(${WASM3_SRCS} PROPERTIES COMPILE_OPTIONS "-w")
+endif()

@@ -43,13 +43,19 @@ typedef struct frame_ctx {
 } frame_ctx_t;
 
 typedef enum {
-    FRAME_APP_STATE_CREATED = 0,
-    FRAME_APP_STATE_RUNNING,
-    FRAME_APP_STATE_PAUSED,
-    FRAME_APP_STATE_STOPPED,
-    FRAME_APP_STATE_DESTROYED,
-} frame_app_state_t;
+    FRAME_APP_LIFECYCLE_CREATED = 0,
+    FRAME_APP_LIFECYCLE_RUNNING,
+    FRAME_APP_LIFECYCLE_PAUSED,
+    FRAME_APP_LIFECYCLE_STOPPED,
+    FRAME_APP_LIFECYCLE_DESTROYED,
+} frame_app_lifecycle_t;
 
+/* Deprecated aliases — remove after December 2026. */
+#define FRAME_APP_STATE_CREATED   FRAME_APP_LIFECYCLE_CREATED
+#define FRAME_APP_STATE_RUNNING   FRAME_APP_LIFECYCLE_RUNNING
+#define FRAME_APP_STATE_PAUSED    FRAME_APP_LIFECYCLE_PAUSED
+#define FRAME_APP_STATE_STOPPED   FRAME_APP_LIFECYCLE_STOPPED
+#define FRAME_APP_STATE_DESTROYED FRAME_APP_LIFECYCLE_DESTROYED
 typedef struct frame_app_descriptor {
     uint32_t    abi_version;         /* must equal FRAME_ABI_VERSION */
     const char *id;

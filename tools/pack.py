@@ -71,7 +71,20 @@ def cmd_build(args) -> int:
 
     with open(args.manifest, "r", encoding="utf-8") as f:
         manifest = json.load(f)
-    manifest["kind"] = args.kind
+    # --kind overrides the manifest; without it we keep what the manifest says,
+    # falling back to auto-detection only when the manifest has no kind.
+    if args.kind is not None:
+        manifest["kind"] = args.kind
+    elif "kind" not in manifest:
+        # auto-detect: wasm payloads are managed, everything else native
+        try:
+            frame_pkg.inspect_wasm(payload)
+            manifest["kind"] = "managed"
+        except frame_pkg.PkgError:
+            manifest["kind"] = "native"
+    # args.kind now reflects the final value for the wasm/native checks below
+    if args.kind is None:
+        args.kind = manifest["kind"]
 
     icon = None
     if args.icon:

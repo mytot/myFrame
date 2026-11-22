@@ -92,9 +92,13 @@ function(frame_project_setup repo_root)
     # can REQUIRES frame_board regardless of the directory it lives in.
     set(EXTRA_COMPONENT_DIRS "${FRAME_BOARD_DIR}" "${repo_root}/components" PARENT_SCOPE)
 
-    # Refuse a release build that would skip signature verification.
-    if(FRAME_RELEASE AND FRAME_STORE_ALLOW_UNSIGNED)
-        message(FATAL_ERROR "Release build requested with FRAME_STORE_ALLOW_UNSIGNED; remove it.")
+    # Release builds must pin a real store key and must not use the dev keypair
+    # that lives in the repo. build.py enforces the sdkconfig checks (ALLOW_UNSIGNED
+    # and HTTP_API); this catches the obvious mistake at configure time.
+    if(FRAME_RELEASE)
+        if(FRAME_STORE_KEY_FILE MATCHES "keys/dev")
+            message(FATAL_ERROR "FRAME_RELEASE=1 but FRAME_STORE_KEY_FILE is still '${FRAME_STORE_KEY_FILE}' — a release must pin a key outside the repo (pass -DFRAME_STORE_KEY_FILE=/safe/place/store_root.pub or use tools/build.py --release --key <key>)")
+        endif()
     endif()
 endfunction()
 

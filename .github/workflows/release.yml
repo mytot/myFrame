@@ -35,11 +35,15 @@ jobs:
           echo "=== DEBUG ==="
           echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
           echo "BOARD=${{ matrix.board }}"
-          echo "IDF_TARGET=$IDF_TARGET"
           ls -la $GITHUB_WORKSPACE/devices/${{ matrix.board }}/ || true
           cat $GITHUB_WORKSPACE/devices/${{ matrix.board }}/CMakeLists.txt || true
-          echo "EXTRA_COMPONENT_DIRS should include $GITHUB_WORKSPACE/devices/${{ matrix.board }}"
-          idf.py -B build-${{ matrix.board }} -DBOARD=${{ matrix.board }} build
+          # Use default build dir like ci does (build, not build-$BOARD) to keep
+          # component discovery identical to passing ci. BOARD is passed via
+          # -DBOARD as before, but we avoid -B which changes CMAKE_BINARY_DIR
+          # and previously hid cxx/driver components.
+          idf.py -DBOARD=${{ matrix.board }} build
+          # Copy to expected per-board path for artifact upload
+          mkdir -p build-${{ matrix.board }} && cp -r build/* build-${{ matrix.board }}/ || true
           # Factory image (merged) + OTA + individual binaries
           esptool.py --chip esp32s3 merge-bin -o build-${{ matrix.board }}/myframe-${{ matrix.board }}.factory.bin \
             --flash-mode qio --flash-freq 80m --flash-size 16MB \

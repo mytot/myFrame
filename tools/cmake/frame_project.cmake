@@ -94,11 +94,9 @@ function(frame_project_setup repo_root)
 
     # Board component plus every Frame component; names are fixed so callers
     # can REQUIRES frame_board regardless of the directory it lives in.
-    # EXTRA_COMPONENT_DIRS can point to a single component directory or to a
-    # container — IDF handles both. We also mirror to COMPONENT_DIRS for
-    # IDF v5+ compatibility where EXTRA_COMPONENT_DIRS is deprecated.
+    # EXTRA_COMPONENT_DIRS is the IDF-supported way to add local components;
+    # COMPONENT_DIRS would overwrite IDF's built-in cxx/driver/esp_lcd etc.
     set(EXTRA_COMPONENT_DIRS "${FRAME_BOARD_DIR}" "${repo_root}/components" PARENT_SCOPE)
-    set(COMPONENT_DIRS "${FRAME_BOARD_DIR}" "${repo_root}/components" PARENT_SCOPE)
     message(STATUS "FrameOS: BOARD=${BOARD} FRAME_BOARD_DIR=${FRAME_BOARD_DIR}")
     message(STATUS "FrameOS: EXTRA_COMPONENT_DIRS=${FRAME_BOARD_DIR};${repo_root}/components")
 

@@ -2,10 +2,12 @@ name: pages
 on:
   push:
     branches: ["**"]
+    tags: ["v*", "V*"]
     paths: [site/**, docs/**, devices/**, .github/workflows/pages.yml]
   pull_request:
     paths: [site/**, docs/**, devices/**, .github/workflows/pages.yml]
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read

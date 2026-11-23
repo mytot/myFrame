@@ -2,7 +2,7 @@
 build/
 build-*/
 dist/
-store/
+/store/
 sdkconfig
 sdkconfig.old
 dependencies.lock

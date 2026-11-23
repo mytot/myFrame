@@ -1,12 +1,15 @@
 name: release
 on:
   push:
-    tags: ["v*"]
+    tags: ["v*", "V*"]
+  release:
+    types: [published, prereleased]
   workflow_dispatch:
     inputs:
       tag:
-        description: "Tag to build (e.g. v0.1.0)"
+        description: "Tag to build (e.g. v0.1.0 or V0.0.1-alpha)"
         required: false
+        type: string
 
 permissions:
   contents: write
@@ -19,7 +22,11 @@ jobs:
       matrix:
         board: [sunton_esp32_8048s070]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+        with:
+          # For tag push: github.ref is the tag. For dispatch: use input. For release: use tag_name.
+          ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
       - name: Build ${{ matrix.board }}
         run: |
           . $IDF_PATH/export.sh
@@ -37,20 +44,24 @@ jobs:
             0x8000 build-${{ matrix.board }}/partition_table/partition-table.bin \
             0x20000 build-${{ matrix.board }}/myframe.bin
           cp build-${{ matrix.board }}/myframe.bin build-${{ matrix.board }}/myframe-${{ matrix.board }}.ota.bin
-          ls -lh build-${{ matrix.board }}/*.bin
+          ls -lh build-${{ matrix.board }}/*.bin || true
+          cat build-${{ matrix.board }}/flasher_args.json 2>&1 | head -20 || true
           idf.py -B build-${{ matrix.board }} size
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: firmware-${{ matrix.board }}
           path: |
             build-${{ matrix.board }}/*.factory.bin
             build-${{ matrix.board }}/*.ota.bin
             build-${{ matrix.board }}/flasher_args.json
+          if-no-files-found: warn
 
   release:
     needs: build
     runs-on: ubuntu-24.04
-    if: startsWith(github.ref, 'refs/tags/')
+    # Run on tag push, release publish, or manual dispatch with a tag
+    if: always() && !cancelled() && (startsWith(github.ref, 'refs/tags/') || github.event_name == 'release' || inputs.tag != '')
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -60,15 +71,6 @@ jobs:
       - uses: softprops/action-gh-release@v2
         with:
           files: dist/**/*
+          tag_name: ${{ inputs.tag || github.ref_name || github.event.release.tag_name }}
           generate_release_notes: true
           fail_on_unmatched_files: false
-
-  # On tag, also rebuild Pages so flasher sees the new release immediately
-  pages:
-    needs: build
-    if: startsWith(github.ref, 'refs/tags/')
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    uses: ./.github/workflows/pages.yml

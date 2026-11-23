@@ -37,12 +37,10 @@ jobs:
           echo "BOARD=${{ matrix.board }}"
           ls -la $GITHUB_WORKSPACE/devices/${{ matrix.board }}/ || true
           cat $GITHUB_WORKSPACE/devices/${{ matrix.board }}/CMakeLists.txt || true
-          # Use default build dir like ci does (build, not build-$BOARD) to keep
-          # component discovery identical to passing ci. BOARD is passed via
-          # -DBOARD as before, but we avoid -B which changes CMAKE_BINARY_DIR
-          # and previously hid cxx/driver components.
-          idf.py -DBOARD=${{ matrix.board }} build
-          # Copy to expected per-board path for artifact upload
+          # Match ci/idf-build exactly (no -B, no -DBOARD — default board is
+          # sunton_esp32_8048s070 via FRAME_DEFAULT_BOARD, so extra flag is
+          # not needed and previously broke component discovery)
+          idf.py build
           mkdir -p build-${{ matrix.board }} && cp -r build/* build-${{ matrix.board }}/ || true
           # Factory image (merged) + OTA + individual binaries
           esptool.py --chip esp32s3 merge-bin -o build-${{ matrix.board }}/myframe-${{ matrix.board }}.factory.bin \

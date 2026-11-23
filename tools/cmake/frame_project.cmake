@@ -92,15 +92,13 @@ function(frame_project_setup repo_root)
         message(FATAL_ERROR "gen_store_key_header.py failed:\n${_err}")
     endif()
 
-    # Board component plus every Frame component; names are fixed so callers
-    # can REQUIRES frame_board regardless of the directory it lives in.
-    # EXTRA_COMPONENT_DIRS must point to a *container* dir, not a single
-    # component dir — IDF scans subdirs of each entry.  So we point to
-    # devices/ (which contains sunton_esp32_8048s070/ with COMPONENT_NAME
-    # override) plus components/.
-    set(EXTRA_COMPONENT_DIRS "${repo_root}/devices" "${repo_root}/components" PARENT_SCOPE)
+    # Board component is now in components/frame_board (generic, uses
+    # generated frame_board_gen.h for per-board pins) — devices/<board>
+    # is only config (device.json/partitions.csv). So EXTRA_COMPONENT_DIRS
+    # just needs components/.
+    set(EXTRA_COMPONENT_DIRS "${repo_root}/components" PARENT_SCOPE)
     message(STATUS "FrameOS: BOARD=${BOARD} FRAME_BOARD_DIR=${FRAME_BOARD_DIR}")
-    message(STATUS "FrameOS: EXTRA_COMPONENT_DIRS=${repo_root}/devices;${repo_root}/components")
+    message(STATUS "FrameOS: EXTRA_COMPONENT_DIRS=${repo_root}/components")
 
     # Release builds must pin a real store key and must not use the dev keypair
     # that lives in the repo. build.py enforces the sdkconfig checks (ALLOW_UNSIGNED

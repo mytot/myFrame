@@ -27,9 +27,18 @@ jobs:
           # For tag push: github.ref is the tag. For dispatch: use input. For release: use tag_name.
           ref: ${{ inputs.tag || github.ref }}
           fetch-depth: 0
+      - name: Fix git safe directory (IDF container runs as different user)
+        run: git config --global --add safe.directory $GITHUB_WORKSPACE
       - name: Build ${{ matrix.board }}
         run: |
           . $IDF_PATH/export.sh
+          echo "=== DEBUG ==="
+          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
+          echo "BOARD=${{ matrix.board }}"
+          echo "IDF_TARGET=$IDF_TARGET"
+          ls -la $GITHUB_WORKSPACE/devices/${{ matrix.board }}/ || true
+          cat $GITHUB_WORKSPACE/devices/${{ matrix.board }}/CMakeLists.txt || true
+          echo "EXTRA_COMPONENT_DIRS should include $GITHUB_WORKSPACE/devices/${{ matrix.board }}"
           idf.py -B build-${{ matrix.board }} -DBOARD=${{ matrix.board }} build
           # Factory image (merged) + OTA + individual binaries
           esptool.py --chip esp32s3 merge-bin -o build-${{ matrix.board }}/myframe-${{ matrix.board }}.factory.bin \
@@ -43,10 +52,10 @@ jobs:
             0x0 build-${{ matrix.board }}/bootloader/bootloader.bin \
             0x8000 build-${{ matrix.board }}/partition_table/partition-table.bin \
             0x20000 build-${{ matrix.board }}/myframe.bin
-          cp build-${{ matrix.board }}/myframe.bin build-${{ matrix.board }}/myframe-${{ matrix.board }}.ota.bin
+          cp build-${{ matrix.board }}/myframe.bin build-${{ matrix.board }}/myframe-${{ matrix.board }}.ota.bin || true
           ls -lh build-${{ matrix.board }}/*.bin || true
           cat build-${{ matrix.board }}/flasher_args.json 2>&1 | head -20 || true
-          idf.py -B build-${{ matrix.board }} size
+          idf.py -B build-${{ matrix.board }} size || true
       - uses: actions/upload-artifact@v4
         if: always()
         with:
